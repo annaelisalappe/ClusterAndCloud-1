@@ -2,6 +2,7 @@
 
 from mpi4py import MPI
 import json
+from collections import defaultdict
 
 # MPI setup
 comm = MPI.COMM_WORLD
@@ -27,25 +28,43 @@ def split_and_read_file():
         if rank > 0:
             f.readline()  # Move to the next full line to avoid double-processing
 
-        max_entry = None
-        max_sentiment = float("-inf")
+        user_sentiment = defaultdict(float)
 
         while f.tell() < end_pos:
             line = f.readline()
             if not line:
-                break
+                continue
 
             entry = process_line(line)
-            if entry and entry[1] > max_sentiment:
-                max_sentiment = entry[1]
-                max_entry = entry
+            if entry:
+                hour, sentiment, account_id, username = entry
+                if account_id and username:
+                    user_sentiment[(account_id, username)] += sentiment
 
-    local_max = (max_sentiment, max_entry if max_entry else (None, None, None, None))
-    global_max = comm.allreduce(local_max, op=MPI.MAXLOC)
+    # local_max = (max_sentiment, max_entry if max_entry else (None, None, None, None))
+    # global_max = comm.allreduce(local_max, op=MPI.MAXLOC)
 
     # Rank 0 prints the highest sentiment post
-    if rank == 0 and global_max[1] != (None, None, None, None):
-        print(f"Max sentiment post: {global_max[1]}")
+    # if rank == 0 and global_max[1] != (None, None, None, None):
+    #     print(f"Max sentiment post: {global_max[1]}")
+
+    # Gather results from all workers
+    all_user_sentiment = comm.gather(user_sentiment, root=0)
+
+    if rank == 0:
+        final_user_sentiment = defaultdict(float)
+        for user_dict in all_user_sentiment:
+            for key, value in user_dict.items():
+                final_user_sentiment[key] += value
+
+        # Sort users by sentiment score and get the top 5 happiest users
+        top_5_happiest = sorted(final_user_sentiment.items(), key=lambda x: x[1], reverse=True)[:5]
+        
+        print("Top 5 Happiest Users:")
+        for i, ((account_id, username), score) in enumerate(top_5_happiest, 1):
+            print(f"({i}) {username}, account id {account_id} with a total positive sentiment score of {score:.2f}")
+
+
 
 def process_line(line):
     try:
