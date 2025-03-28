@@ -58,9 +58,10 @@ def split_and_read_file():
                 final_user_sentiment[key] += value
 
         # Sort users by sentiment score and get the top 5 happiest users
-        sorted_sentiments = sorted(final_user_sentiment.items(), key=lambda x: x[1], reverse=True)
-        top_5_happiest = sorted_sentiments[:5]
-        top_5_unhappiest = sorted_sentiments[-5:].reverse()
+        sorted_sentiments = sorted(final_user_sentiment.items(), key=lambda x: x[1])
+        top_5_unhappiest = sorted_sentiments[:5] # Sorted from low to high, so unhappiest users are at the start
+        top_5_happiest = sorted_sentiments[-5:]
+        top_5_happiest.reverse()
         
         print("Top 5 Happiest Users:")
         for i, ((account_id, username), score) in enumerate(top_5_happiest, 1):
@@ -89,6 +90,14 @@ def process_line(line):
     return None
 
 if __name__ == "__main__":
+    if rank == 0:
+        start_time = MPI.Wtime()
+
     split_and_read_file()
+    if rank == 0:
+        end_time = MPI.Wtime()
+        total_time = end_time - start_time
+        print(f"Execution time: {total_time} seconds.")
+
 
 
