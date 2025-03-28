@@ -58,12 +58,17 @@ def split_and_read_file():
                 final_user_sentiment[key] += value
 
         # Sort users by sentiment score and get the top 5 happiest users
-        top_5_happiest = sorted(final_user_sentiment.items(), key=lambda x: x[1], reverse=True)[:5]
+        sorted_sentiments = sorted(final_user_sentiment.items(), key=lambda x: x[1], reverse=True)
+        top_5_happiest = sorted_sentiments[:5]
+        top_5_unhappiest = sorted_sentiments[-5:].reverse()
         
         print("Top 5 Happiest Users:")
         for i, ((account_id, username), score) in enumerate(top_5_happiest, 1):
-            print(f"({i}) {username}, account id {account_id} with a total positive sentiment score of {score:.2f}")
+            print(f"({i}) {username}, account id {account_id} with a total sentiment score of {score:.2f}")
 
+        print("Top 5 Unhappiest Users:")
+        for i, ((account_id, username), score) in enumerate(top_5_unhappiest, 1):
+            print(f"({i}) {username}, account id {account_id} with a total sentiment score of {score:.2f}")
 
 
 def process_line(line):
