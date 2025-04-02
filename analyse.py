@@ -10,7 +10,7 @@ comm = MPI.COMM_WORLD
 global_size = comm.Get_size()
 rank = comm.Get_rank()
 
-ndjson_file = "./mastodon-106k.ndjson"
+ndjson_file = "./mastodon-16m.ndjson"
 
 
 def split_and_read_file():
@@ -21,9 +21,6 @@ def split_and_read_file():
 
         start_pos = rank * chunk_size_per_worker
         end_pos = start_pos + chunk_size_per_worker if rank != global_size - 1 else file_size # in case file size not divisible by world size
-
-        first_line = f.readline().strip()
-        print(process_line(first_line))
 
         f.seek(start_pos)
         if rank > 0:
@@ -46,12 +43,6 @@ def split_and_read_file():
                 if hour:
                     hour_sentiment[hour] += sentiment
 
-    # local_max = (max_sentiment, max_entry if max_entry else (None, None, None, None))
-    # global_max = comm.allreduce(local_max, op=MPI.MAXLOC)
-
-    # Rank 0 prints the highest sentiment post
-    # if rank == 0 and global_max[1] != (None, None, None, None):
-    #     print(f"Max sentiment post: {global_max[1]}")
 
     # Gather results from all workers
     all_user_sentiment = comm.gather(user_sentiment, root=0)
