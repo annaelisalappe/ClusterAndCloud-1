@@ -3,13 +3,14 @@
 from mpi4py import MPI
 import json
 from collections import defaultdict
+from datetime import datetime
 
 # MPI setup
 comm = MPI.COMM_WORLD
 global_size = comm.Get_size()
 rank = comm.Get_rank()
 
-ndjson_file = "./mastodon-16m.ndjson"
+ndjson_file = "./mastodon-106k.ndjson"
 
 
 def split_and_read_file():
@@ -29,6 +30,7 @@ def split_and_read_file():
             f.readline()  # Move to the next full line to avoid double-processing
 
         user_sentiment = defaultdict(float)
+        hour_sentiment = defaultdict(float)
 
         while f.tell() < end_pos:
             line = f.readline()
@@ -40,6 +42,9 @@ def split_and_read_file():
                 hour, sentiment, account_id, username = entry
                 if account_id and username:
                     user_sentiment[(account_id, username)] += sentiment
+                
+                if hour:
+                    hour_sentiment[hour] += sentiment
 
     # local_max = (max_sentiment, max_entry if max_entry else (None, None, None, None))
     # global_max = comm.allreduce(local_max, op=MPI.MAXLOC)
@@ -50,19 +55,34 @@ def split_and_read_file():
 
     # Gather results from all workers
     all_user_sentiment = comm.gather(user_sentiment, root=0)
+    all_hour_sentiment = comm.gather(hour_sentiment, root=0) 
 
     if rank == 0:
         final_user_sentiment = defaultdict(float)
+        final_hour_sentiment = defaultdict(float)
+
+        # Combine user sentiment results
         for user_dict in all_user_sentiment:
             for key, value in user_dict.items():
                 final_user_sentiment[key] += value
 
-        # Sort users by sentiment score and get the top 5 happiest users
+         # Combine hour sentiment results
+        for hour_dict in all_hour_sentiment:
+            for key, value in hour_dict.items():
+                final_hour_sentiment[key] += value
+
+        # Sort users by sentiment score and get the top 5 happiest/saddest users
         sorted_sentiments = sorted(final_user_sentiment.items(), key=lambda x: x[1])
         top_5_unhappiest = sorted_sentiments[:5] # Sorted from low to high, so unhappiest users are at the start
         top_5_happiest = sorted_sentiments[-5:]
         top_5_happiest.reverse()
         
+        # Sort hours by sentiment score and get te top 5 happiest/saddest hours
+        sorted_hours = sorted(final_hour_sentiment.items(), key=lambda x: x[1])
+        top_5_saddest_hours = sorted_hours[:5]
+        top_5_happiest_hours = sorted_hours[-5:]
+        top_5_happiest_hours.reverse()
+
         print("Top 5 Happiest Users:")
         for i, ((account_id, username), score) in enumerate(top_5_happiest, 1):
             print(f"({i}) {username}, account id {account_id} with a total sentiment score of {score:.2f}")
@@ -71,6 +91,13 @@ def split_and_read_file():
         for i, ((account_id, username), score) in enumerate(top_5_unhappiest, 1):
             print(f"({i}) {username}, account id {account_id} with a total sentiment score of {score:.2f}")
 
+        print("Top 5 Happiest Hours:")
+        for i, (hour, score) in enumerate(top_5_happiest_hours, 1):
+            print(f"({i}) {hour} with a total sentiment score of {score:.2f}")
+
+        print("Top 5 Saddest Hours:")
+        for i, (hour, score) in enumerate(top_5_saddest_hours, 1):
+            print(f"({i}) {hour} with a total sentiment score of {score:.2f}")
 
 def process_line(line):
     try:
@@ -82,11 +109,18 @@ def process_line(line):
         account_id = account.get("id", None)
         username = account.get("username", None)
         
-        if sentiment is not None:
-            return (created_at, sentiment, account_id, username)
+        # if sentiment is not None:
+        #     return (created_at, sentiment, account_id, username)
+
+        if sentiment is not None and created_at: 
+            # Extract hour from the timestamp
+            dt = datetime.strptime(created_at, "%Y-%m-%dT%H:%M:%S.%fZ")
+            hour = dt.strftime("%Y-%m-%d %H:00")  # Format as "YYYY-MM-DD HH:00" (hour level)
+            return (hour, sentiment, account_id, username)
+
 
     except json.JSONDecodeError as e:
-        print(f"Error found at line: {line}.")
+        print(f"Error found at line: {line}.")   # Here we should simply 'pass' instead
     return None
 
 if __name__ == "__main__":
