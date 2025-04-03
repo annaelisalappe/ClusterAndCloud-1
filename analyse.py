@@ -37,9 +37,16 @@ def split_and_read_file():
                 entry = process_line(line)
                 if entry:
                     hour, sentiment, account_id, username = entry
-                    
+
                     if not isinstance(sentiment, (int, float)):
                         print(f"Warning: 'sentiment' should be of type 'int' or 'float', but got {type(sentiment)}. Value: {sentiment}")
+                        continue
+                    
+                    if (not isinstance(account_id, str)) or (not isinstance(username, str)):
+                        print(f"Warning: 'account_id' or 'username' has an unexpected type. "
+                            f"account_id type: {type(account_id)}, value: {account_id}; "
+                            f"username type: {type(username)}, value: {username}")
+                        continue
 
                     if sentiment and account_id and username:
                         user_sentiment[(account_id, username)] += sentiment
