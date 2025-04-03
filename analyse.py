@@ -33,8 +33,6 @@ def split_and_read_file():
 
             while f.tell() < end_pos:
                 line = f.readline()
-                # if not line:
-                #     continue
 
                 entry = process_line(line)
                 if entry:
@@ -63,7 +61,7 @@ def split_and_read_file():
             for key, value in user_dict.items():
                 final_user_sentiment[key] += value
 
-         # Combine hour sentiment results
+        # Combine hour sentiment results
         for hour_dict in all_hour_sentiment:
             for key, value in hour_dict.items():
                 final_hour_sentiment[key] += value
