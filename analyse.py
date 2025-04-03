@@ -14,35 +14,41 @@ ndjson_file = "./mastodon-16m.ndjson"
 
 
 def split_and_read_file():
-    with open(ndjson_file, 'r', encoding='utf-8') as f:
-        f.seek(0, 2)  # Move to the end of the file to get size
-        file_size = f.tell()
-        chunk_size_per_worker = file_size // global_size  # Divide the file into equal chunks
 
-        start_pos = rank * chunk_size_per_worker
-        end_pos = start_pos + chunk_size_per_worker if rank != global_size - 1 else file_size # in case file size not divisible by world size
+    try: 
+        with open(ndjson_file, 'r', encoding='utf-8') as f:
+            f.seek(0, 2)  # Move to the end of the file to get size
+            file_size = f.tell()
+            chunk_size_per_worker = file_size // global_size  # Divide the file into equal chunks
 
-        f.seek(start_pos)
-        if rank > 0:
-            f.readline()  # Move to the next full line to avoid double-processing
+            start_pos = rank * chunk_size_per_worker
+            end_pos = start_pos + chunk_size_per_worker if rank != global_size - 1 else file_size # in case file size not divisible by world size
 
-        user_sentiment = defaultdict(float)
-        hour_sentiment = defaultdict(float)
+            f.seek(start_pos)
+            if rank > 0:
+                f.readline()  # Move to the next full line to avoid double-processing
 
-        while f.tell() < end_pos:
-            line = f.readline()
-            # if not line:
-            #     continue
+            user_sentiment = defaultdict(float)
+            hour_sentiment = defaultdict(float)
 
-            entry = process_line(line)
-            if entry:
-                hour, sentiment, account_id, username = entry
-                if sentiment and account_id and username:
-                    user_sentiment[(account_id, username)] += sentiment
-                
-                if sentiment and hour:
-                    hour_sentiment[hour] += sentiment
+            while f.tell() < end_pos:
+                line = f.readline()
+                # if not line:
+                #     continue
 
+                entry = process_line(line)
+                if entry:
+                    hour, sentiment, account_id, username = entry
+                    if sentiment and account_id and username:
+                        user_sentiment[(account_id, username)] += sentiment
+                    
+                    if sentiment and hour:
+                        hour_sentiment[hour] += sentiment
+
+
+    except Exception as e:
+        print(f"An error occurred while opening the file.")
+        return
 
     # Gather results from all workers
     all_user_sentiment = comm.gather(user_sentiment, root=0)
@@ -104,11 +110,12 @@ def process_line(line):
             # Extract hour from the timestamp
             dt = datetime.strptime(created_at, "%Y-%m-%dT%H:%M:%S.%fZ")
             hour = dt.strftime("%Y-%m-%d %H:00")  # Format as "YYYY-MM-DD HH:00" (hour level)
-        
+
         return (hour, sentiment, account_id, username)
 
-    except json.JSONDecodeError as e:
+    except (json.JSONDecodeError, ValueError) as e:
         print(f"Line at line {line} could not be processed. Skipping.")   # Here we should simply 'pass' instead
+    
     return None
 
 if __name__ == "__main__":
