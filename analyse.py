@@ -4,14 +4,15 @@ from mpi4py import MPI
 import json
 from collections import defaultdict
 from datetime import datetime
+from pathlib import Path
 
 # MPI setup
 comm = MPI.COMM_WORLD
 global_size = comm.Get_size()
 rank = comm.Get_rank()
 
-ndjson_file = "./mastodon-16m.ndjson"
 
+ndjson_file = Path("../mastodon-16m.ndjson")
 
 def split_and_read_file():
 

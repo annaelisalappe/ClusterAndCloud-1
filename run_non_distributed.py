@@ -3,7 +3,7 @@ import heapq
 from collections import defaultdict
 from datetime import datetime
 import timeit
-
+from pathlib import Path
 
 def analyze_sentiment(file):
     user_sentiments = defaultdict(float)
@@ -70,7 +70,8 @@ def process_line(line):
     return None
 
 start_time = timeit.timeit()
-analyze_sentiment("./mastodon-16m.ndjson")
+ndjson_file = Path("../mastodon-16m.ndjson")
+analyze_sentiment(ndjson_file)
 end_time = timeit.timeit()
 total_time = end_time - start_time
 print(f"Execution time: {total_time} seconds.")
