@@ -31,16 +31,16 @@ def split_and_read_file():
 
         while f.tell() < end_pos:
             line = f.readline()
-            if not line:
-                continue
+            # if not line:
+            #     continue
 
             entry = process_line(line)
             if entry:
                 hour, sentiment, account_id, username = entry
-                if account_id and username:
+                if sentiment and account_id and username:
                     user_sentiment[(account_id, username)] += sentiment
                 
-                if hour:
+                if sentiment and hour:
                     hour_sentiment[hour] += sentiment
 
 
@@ -99,19 +99,16 @@ def process_line(line):
         account = doc.get("account", {})
         account_id = account.get("id", None)
         username = account.get("username", None)
-        
-        # if sentiment is not None:
-        #     return (created_at, sentiment, account_id, username)
 
-        if sentiment is not None and created_at: 
+        if created_at: 
             # Extract hour from the timestamp
             dt = datetime.strptime(created_at, "%Y-%m-%dT%H:%M:%S.%fZ")
             hour = dt.strftime("%Y-%m-%d %H:00")  # Format as "YYYY-MM-DD HH:00" (hour level)
-            return (hour, sentiment, account_id, username)
-
+        
+        return (hour, sentiment, account_id, username)
 
     except json.JSONDecodeError as e:
-        print(f"Error found at line: {line}.")   # Here we should simply 'pass' instead
+        print(f"Line at line {line} could not be processed. Skipping.")   # Here we should simply 'pass' instead
     return None
 
 if __name__ == "__main__":
