@@ -1,8 +1,8 @@
 #!/bin/bash
-#SBATCH --time=05:00:00
+#SBATCH --time=01:00:00
 #SBATCH --job-name=anna(e)lisas_job
-#SBATCH --output=outputs-1n-8c/output.out
-#SBATCH --error=outputs-1n-8c/error.err
+#SBATCH --output=outputs-2n-8c/output.out
+#SBATCH --error=outputs-2n-8c/error.err
 
 ml GCCcore/11.3.0 Python/3.11.3 OpenMPI/4.1.4 mpi4py/3.1.4
 

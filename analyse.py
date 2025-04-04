@@ -124,14 +124,22 @@ def process_line(line):
         account_id = account.get("id", None)
         username = account.get("username", None)
 
-        if created_at: 
-            # Extract hour from the timestamp
-            dt = datetime.strptime(created_at, "%Y-%m-%dT%H:%M:%S.%fZ")
-            hour = dt.strftime("%Y-%m-%d %H:00")  # Format as "YYYY-MM-DD HH:00" (hour level)
+        try:
+            if created_at: 
+                # Extract hour from the timestamp
+                dt = datetime.strptime(created_at, "%Y-%m-%dT%H:%M:%S.%fZ")
+                hour = dt.strftime("%Y-%m-%d %H:00")  # Format as "YYYY-MM-DD HH:00" (hour level)
 
-        return (hour, sentiment, account_id, username)
+                return (hour, sentiment, account_id, username)
+            
+            print("Warning: No value for 'created_at'. This post is skipped for happiest/ saddest hour.")
+            return (None, sentiment, account_id, username)
 
-    except (json.JSONDecodeError, ValueError) as e:
+        except ValueError as e:
+            print(f"Got a ValueError while parsing date {dt}. Skipping this line.")
+            return (None, sentiment, account_id, username)
+        
+    except (json.JSONDecodeError) as e:
         print(f"Line at line {line} could not be processed. Skipping.")   # Here we should simply 'pass' instead
         return None
 
