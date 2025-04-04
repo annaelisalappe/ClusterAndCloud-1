@@ -1,0 +1,38 @@
+Rank 5 reading bytes 96194297395 to 115433156874.
+Rank 7 reading bytes 134672016353 to 153910875839.
+Rank 4 reading bytes 76955437916 to 96194297395.
+Rank 6 reading bytes 115433156874 to 134672016353.
+Successfully opened the file! Reading data...
+Rank 3 reading bytes 57716578437 to 76955437916.
+Rank 0 reading bytes 0 to 19238859479.
+Rank 2 reading bytes 38477718958 to 57716578437.
+Rank 1 reading bytes 19238859479 to 38477718958.
+Warning: No value for 'created_at'. This post is skipped for happiest/ saddest hour.
+Warning: 'sentiment' should be of type 'int' or 'float', but got <class 'NoneType'>. Value: None
+Warning: No value for 'created_at'. This post is skipped for happiest/ saddest hour.
+Warning: 'sentiment' should be of type 'int' or 'float', but got <class 'NoneType'>. Value: None
+Top 5 Happiest Users:
+(1) gameoflife, account id 110237351908820391 with a total sentiment score of 9105.741942204433
+(2) TheFigen_, account id 112728392129924952 with a total sentiment score of 2541.4742243891906
+(3) EmojiAquarium, account id 113441357479871732 with a total sentiment score of 2086.4567379515915
+(4) choochoo, account id 113541715572887376 with a total sentiment score of 1978.743101102543
+(5) hnbot, account id 110006430181118061 with a total sentiment score of 1917.7935878054188
+Top 5 Unhappiest Users:
+(1) realTuckFrumper, account id 109521050152429017 with a total sentiment score of -9094.08127545372
+(2) uavideos, account id 109471254002284799 with a total sentiment score of -5901.960347560852
+(3) TheHindu, account id 113443732887173058 with a total sentiment score of -5710.722600655697
+(4) uutisbot, account id 111873606251312850 with a total sentiment score of -4066.138170138108
+(5) MissingYou, account id 112071598249945636 with a total sentiment score of -3341.603338119541
+Top 5 Happiest Hours:
+(1) 2025-01-01 00:00 with a total sentiment score of 206.15209972304456
+(2) 2024-12-31 23:00 with a total sentiment score of 187.465476632202
+(3) 2025-01-01 05:00 with a total sentiment score of 135.92521743446838
+(4) 2024-12-24 22:00 with a total sentiment score of 117.2863136120121
+(5) 2024-12-25 15:00 with a total sentiment score of 114.60195453225167
+Top 5 Saddest Hours:
+(1) 2024-11-06 07:00 with a total sentiment score of -373.76724797383497
+(2) 2024-09-11 01:00 with a total sentiment score of -305.5760669374102
+(3) 2025-01-30 17:00 with a total sentiment score of -256.5684250419817
+(4) 2025-01-30 18:00 with a total sentiment score of -226.90971970072644
+(5) 2025-02-03 16:00 with a total sentiment score of -223.83348768435087
+Execution time: 686.528094807 seconds.
