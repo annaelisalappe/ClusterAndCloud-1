@@ -1,11 +1,8 @@
 #!/bin/bash
-#SBATCH --time=0:05:0
-#SBATCH --nodes=2
-#SBATCH --job-name=anna(e)lisas_test
-#SBATCH --ntasks=4 
-#SBATCH --ntasks-per-node=4
-#SBATCH --output=outputs/output.out
-#SBATCH --error=outputs/error.err
+#SBATCH --time=05:00:00
+#SBATCH --job-name=anna(e)lisas_job
+#SBATCH --output=outputs-1n-8c/output.out
+#SBATCH --error=outputs-1n-8c/error.err
 
 ml GCCcore/11.3.0 Python/3.11.3 OpenMPI/4.1.4 mpi4py/3.1.4
 
@@ -15,5 +12,5 @@ if [[ "$1" == "test_only" ]]; then
     wait 
     diff outputs/distributed_output.out outputs/non_distributed_output.out
 else
-    srun python3 analyse.py
+    srun python3 -u analyse.py
 fi

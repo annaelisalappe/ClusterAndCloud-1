@@ -12,53 +12,61 @@ global_size = comm.Get_size()
 rank = comm.Get_rank()
 
 
-ndjson_file = Path("../mastodon-16m.ndjson")
+ndjson_file = Path("../mastodon-144g.ndjson").resolve()
 
 def split_and_read_file():
 
-    try: 
-        with open(ndjson_file, 'r', encoding='utf-8') as f:
-            f.seek(0, 2)  # Move to the end of the file to get size
-            file_size = f.tell()
-            chunk_size_per_worker = file_size // global_size  # Divide the file into equal chunks
+    with open(ndjson_file, 'r', encoding='utf-8') as f:
+        if rank == 0:
+            print("Successfully opened the file! Reading data...")
 
-            start_pos = rank * chunk_size_per_worker
-            end_pos = start_pos + chunk_size_per_worker if rank != global_size - 1 else file_size # in case file size not divisible by world size
+        f.seek(0, 2)
+        file_size = f.tell()
 
-            f.seek(start_pos)
-            if rank > 0:
-                f.readline()  # Move to the next full line to avoid double-processing
+        # print(f"Actual file size is {file_size}. Pretending that file size is {20000}.")
+        # file_size = 10000
 
-            user_sentiment = defaultdict(float)
-            hour_sentiment = defaultdict(float)
+        chunk_size_per_worker = file_size // global_size  # Divide the file into equal chunks
+        start_pos = rank * chunk_size_per_worker
+        end_pos = start_pos + chunk_size_per_worker if rank != global_size - 1 else file_size # in case file size not divisible by world size
 
-            while f.tell() < end_pos:
-                line = f.readline()
+        print(f"Rank {rank} reading bytes {start_pos} to {end_pos}.")
+        
+        f.seek(start_pos)
+        if rank > 0:
+            f.readline()  # Move to the next full line to avoid double-processing
 
-                entry = process_line(line)
-                if entry:
-                    hour, sentiment, account_id, username = entry
+        user_sentiment = defaultdict(float)
+        hour_sentiment = defaultdict(float)
 
-                    if not isinstance(sentiment, (int, float)):
-                        print(f"Warning: 'sentiment' should be of type 'int' or 'float', but got {type(sentiment)}. Value: {sentiment}")
-                        continue
-                    
-                    if (not isinstance(account_id, str)) or (not isinstance(username, str)):
-                        print(f"Warning: 'account_id' or 'username' has an unexpected type. "
-                            f"account_id type: {type(account_id)}, value: {account_id}; "
-                            f"username type: {type(username)}, value: {username}")
-                        continue
+        while f.tell() < end_pos:
+            line = f.readline()
+            entry = process_line(line)
 
-                    if sentiment and account_id and username:
-                        user_sentiment[(account_id, username)] += sentiment
-                    
-                    if sentiment and hour:
-                        hour_sentiment[hour] += sentiment
+            if entry:
+                hour, sentiment, account_id, username = entry
 
+                if not isinstance(sentiment, (int, float)):
+                    print("Warning: 'sentiment' should be of type 'int' or 'float', "
+                    f"but got {type(sentiment)}. Value: {sentiment}")
+                    continue
+                
+                if (not isinstance(account_id, str)) or (not isinstance(username, str)):
+                    print(f"Warning: 'account_id' or 'username' has an unexpected type. "
+                        f"account_id type: {type(account_id)}, value: {account_id}; "
+                        f"username type: {type(username)}, value: {username}")
+                    continue
 
-    except Exception as e:
-        print(f"An error occurred while opening the file.")
-        return
+                if (sentiment is not None) and account_id and username:
+                    user_sentiment[(account_id, username)] += sentiment
+                
+                if (sentiment is not None) and hour:
+                    hour_sentiment[hour] += sentiment
+                
+                else:
+                    print("Parsed the entry but didn't add anything. "
+                    f"This is most likely because one of the values was None. The entry was: {entry}")
+
 
     # Gather results from all workers
     all_user_sentiment = comm.gather(user_sentiment, root=0)
@@ -92,19 +100,19 @@ def split_and_read_file():
 
         print("Top 5 Happiest Users:")
         for i, ((account_id, username), score) in enumerate(top_5_happiest, 1):
-            print(f"({i}) {username}, account id {account_id} with a total sentiment score of {score:.2f}")
+            print(f"({i}) {username}, account id {account_id} with a total sentiment score of {score}")
 
         print("Top 5 Unhappiest Users:")
         for i, ((account_id, username), score) in enumerate(top_5_unhappiest, 1):
-            print(f"({i}) {username}, account id {account_id} with a total sentiment score of {score:.2f}")
+            print(f"({i}) {username}, account id {account_id} with a total sentiment score of {score}")
 
         print("Top 5 Happiest Hours:")
         for i, (hour, score) in enumerate(top_5_happiest_hours, 1):
-            print(f"({i}) {hour} with a total sentiment score of {score:.2f}")
+            print(f"({i}) {hour} with a total sentiment score of {score}")
 
         print("Top 5 Saddest Hours:")
         for i, (hour, score) in enumerate(top_5_saddest_hours, 1):
-            print(f"({i}) {hour} with a total sentiment score of {score:.2f}")
+            print(f"({i}) {hour} with a total sentiment score of {score}")
 
 def process_line(line):
     try:
@@ -125,8 +133,7 @@ def process_line(line):
 
     except (json.JSONDecodeError, ValueError) as e:
         print(f"Line at line {line} could not be processed. Skipping.")   # Here we should simply 'pass' instead
-    
-    return None
+        return None
 
 if __name__ == "__main__":
     if rank == 0:
