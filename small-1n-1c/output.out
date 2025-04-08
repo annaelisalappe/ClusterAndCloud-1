@@ -1,0 +1,88 @@
+Benchmark run 1...
+Runtime 1: Successfully opened the file! Reading data...
+Rank 0 reading bytes 0 to 15819061.
+Top 5 Happiest Users:
+(1) amyfou, account id 109321811420418919 with a total sentiment score of 2.3929966114769488
+(2) GolfDigest, account id 110542985111474642 with a total sentiment score of 1.843560606060606
+(3) Eagles, account id 109734012824774037 with a total sentiment score of 1.498867102396514
+(4) stellarskylark, account id 110149910031220379 with a total sentiment score of 1.3333333333333333
+(5) NFL_Memes, account id 109893804991977967 with a total sentiment score of 1.093002113125952
+Top 5 Unhappiest Users:
+(1) morachbeag, account id 109384731896498258 with a total sentiment score of -1.59439770255468
+(2) missladyartemis, account id 109977447109691181 with a total sentiment score of -1.4301725954694224
+(3) byteseu, account id 112202977476831380 with a total sentiment score of -0.949163166036468
+(4) BostonBibliophile, account id 109363139681819635 with a total sentiment score of -0.8698412698412699
+(5) PhoenixSerenity, account id 112605820244754466 with a total sentiment score of -0.8600882718775593
+Top 5 Happiest Hours:
+(1) 2025-02-10 02:00 with a total sentiment score of 15.103229201168425
+(2) 2025-02-10 01:00 with a total sentiment score of 6.48178519268853
+(3) 2025-02-09 02:00 with a total sentiment score of 0.29550866749511756
+(4) 2025-02-09 00:00 with a total sentiment score of 0.10068342689773005
+(5) 2025-02-09 22:00 with a total sentiment score of 0.07518327520883748
+Top 5 Saddest Hours:
+(1) 2025-02-09 23:00 with a total sentiment score of -1.785028232046234
+(2) 2025-02-10 00:00 with a total sentiment score of -0.4511336786283979
+(3) 2025-02-08 23:00 with a total sentiment score of -0.1557886557886558
+(4) 2025-02-09 18:00 with a total sentiment score of -0.1437908496732026
+(5) 2025-02-09 19:00 with a total sentiment score of -0.13482507142558955
+Execution time: 0.345237136 seconds.
+1.427152251 seconds
+Benchmark run 2...
+Runtime 2: Successfully opened the file! Reading data...
+Rank 0 reading bytes 0 to 15819061.
+Top 5 Happiest Users:
+(1) amyfou, account id 109321811420418919 with a total sentiment score of 2.3929966114769488
+(2) GolfDigest, account id 110542985111474642 with a total sentiment score of 1.843560606060606
+(3) Eagles, account id 109734012824774037 with a total sentiment score of 1.498867102396514
+(4) stellarskylark, account id 110149910031220379 with a total sentiment score of 1.3333333333333333
+(5) NFL_Memes, account id 109893804991977967 with a total sentiment score of 1.093002113125952
+Top 5 Unhappiest Users:
+(1) morachbeag, account id 109384731896498258 with a total sentiment score of -1.59439770255468
+(2) missladyartemis, account id 109977447109691181 with a total sentiment score of -1.4301725954694224
+(3) byteseu, account id 112202977476831380 with a total sentiment score of -0.949163166036468
+(4) BostonBibliophile, account id 109363139681819635 with a total sentiment score of -0.8698412698412699
+(5) PhoenixSerenity, account id 112605820244754466 with a total sentiment score of -0.8600882718775593
+Top 5 Happiest Hours:
+(1) 2025-02-10 02:00 with a total sentiment score of 15.103229201168425
+(2) 2025-02-10 01:00 with a total sentiment score of 6.48178519268853
+(3) 2025-02-09 02:00 with a total sentiment score of 0.29550866749511756
+(4) 2025-02-09 00:00 with a total sentiment score of 0.10068342689773005
+(5) 2025-02-09 22:00 with a total sentiment score of 0.07518327520883748
+Top 5 Saddest Hours:
+(1) 2025-02-09 23:00 with a total sentiment score of -1.785028232046234
+(2) 2025-02-10 00:00 with a total sentiment score of -0.4511336786283979
+(3) 2025-02-08 23:00 with a total sentiment score of -0.1557886557886558
+(4) 2025-02-09 18:00 with a total sentiment score of -0.1437908496732026
+(5) 2025-02-09 19:00 with a total sentiment score of -0.13482507142558955
+Execution time: 0.327035643 seconds.
+1.229119382 seconds
+Benchmark run 3...
+Runtime 3: Successfully opened the file! Reading data...
+Rank 0 reading bytes 0 to 15819061.
+Top 5 Happiest Users:
+(1) amyfou, account id 109321811420418919 with a total sentiment score of 2.3929966114769488
+(2) GolfDigest, account id 110542985111474642 with a total sentiment score of 1.843560606060606
+(3) Eagles, account id 109734012824774037 with a total sentiment score of 1.498867102396514
+(4) stellarskylark, account id 110149910031220379 with a total sentiment score of 1.3333333333333333
+(5) NFL_Memes, account id 109893804991977967 with a total sentiment score of 1.093002113125952
+Top 5 Unhappiest Users:
+(1) morachbeag, account id 109384731896498258 with a total sentiment score of -1.59439770255468
+(2) missladyartemis, account id 109977447109691181 with a total sentiment score of -1.4301725954694224
+(3) byteseu, account id 112202977476831380 with a total sentiment score of -0.949163166036468
+(4) BostonBibliophile, account id 109363139681819635 with a total sentiment score of -0.8698412698412699
+(5) PhoenixSerenity, account id 112605820244754466 with a total sentiment score of -0.8600882718775593
+Top 5 Happiest Hours:
+(1) 2025-02-10 02:00 with a total sentiment score of 15.103229201168425
+(2) 2025-02-10 01:00 with a total sentiment score of 6.48178519268853
+(3) 2025-02-09 02:00 with a total sentiment score of 0.29550866749511756
+(4) 2025-02-09 00:00 with a total sentiment score of 0.10068342689773005
+(5) 2025-02-09 22:00 with a total sentiment score of 0.07518327520883748
+Top 5 Saddest Hours:
+(1) 2025-02-09 23:00 with a total sentiment score of -1.785028232046234
+(2) 2025-02-10 00:00 with a total sentiment score of -0.4511336786283979
+(3) 2025-02-08 23:00 with a total sentiment score of -0.1557886557886558
+(4) 2025-02-09 18:00 with a total sentiment score of -0.1437908496732026
+(5) 2025-02-09 19:00 with a total sentiment score of -0.13482507142558955
+Execution time: 0.33171943000000004 seconds.
+1.259317509 seconds
+Average runtime over 3 runs: 0.0466142 seconds

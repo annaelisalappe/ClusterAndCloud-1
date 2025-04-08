@@ -12,7 +12,7 @@ global_size = comm.Get_size()
 rank = comm.Get_rank()
 
 
-ndjson_file = Path("../mastodon-144g.ndjson").resolve()
+ndjson_file = Path("../mastodon-16m.ndjson").resolve()
 
 def split_and_read_file():
 
@@ -22,9 +22,6 @@ def split_and_read_file():
 
         f.seek(0, 2)
         file_size = f.tell()
-
-        # print(f"Actual file size is {file_size}. Pretending that file size is {20000}.")
-        # file_size = 10000
 
         chunk_size_per_worker = file_size // global_size  # Divide the file into equal chunks
         start_pos = rank * chunk_size_per_worker
@@ -140,7 +137,7 @@ def process_line(line):
             return (None, sentiment, account_id, username)
         
     except (json.JSONDecodeError) as e:
-        print(f"Line at line {line} could not be processed. Skipping.")   # Here we should simply 'pass' instead
+        print(f"Line at line {line} could not be processed. Skipping.")
         return None
 
 if __name__ == "__main__":
