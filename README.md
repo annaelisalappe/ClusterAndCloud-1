@@ -83,19 +83,42 @@ The application was submitted to the SPARTAN cluster via SLURM, with the configu
 
     ml GCCcore/11.3.0 Python/3.11.3 OpenMPI/4.1.4 mpi4py/3.1.4
 
+    run_and_measure() {
+        start=$(date +%s.%N)
+        srun python3 -u analyse.py
+        end=$(date +%s.%N)
+        runtime=$(echo "$end - $start" | bc)
+        echo "$runtime"
+    }
+
     if [[ "$1" == "test_only" ]]; then
         srun --output=outputs/distributed_output.out python3 analyse.py &
         srun --ntasks=1 --nodes=1 --exclusive --output=outputs/non_distributed_output.out python3 run_non_distributed.py &
         wait 
         diff outputs/distributed_output.out outputs/non_distributed_output.out
+
+    # NOTE: Only for running on the smaller files!
+    elif [[ "$1" == "benchmark_only" ]]; then
+        runtimes=()
+        for i in {1..3}; do
+            echo "Benchmark run $i..."
+            runtime=$(run_and_measure)
+            runtimes+=("$runtime")
+            echo "Runtime $i: $runtime seconds"
+        done
+
+        avg=$(printf "%s\n" "${runtimes[@]}" | awk '{sum+=$1} END {print sum/NR}')
+        echo "Average runtime over 3 runs: $avg seconds"
+
     else
         srun python3 -u analyse.py
     fi
   ```
 
-The `test_only` argument was used exclusively with the two smaller test files. A script (`run_non_distributed.py`) designed to perform the same task in a non-distributed manner was executed alongside with the distributed script (`analyse.py`), and the outputs were compared. This comparison checks for any differences between the distributed job’s output (`distributed_output.out`) and the non-distributed job’s output (`non_distributed_output.out`), verifying if the parallelized version produces the same results.
-
+The `test_only` and `benchmark_only` arguments were used exclusively with the two smaller test files. When using the  `test_only` flag, a script (`run_non_distributed.py`) designed to perform the same task in a non-distributed manner was executed alongside with the distributed script (`analyse.py`), and the outputs were compared. This comparison checks for any differences between the distributed job’s output (`distributed_output.out`) and the non-distributed job’s output (`non_distributed_output.out`), verifying if the parallelized version produces the same results.
 With the two smaller files, we confirmed that the users and hours returned by both versions matched before proceeding to the larger file, where we could not perform the same comparison test.
+
+The `benchmark_only` flag runs the same code three times, averaging the runtimes. We added this after running our analysis on the larger file to investigate the differences in runtime. 
 
 To run the code with the three different configurations, we executed the following commands (from within the ClusterAndCloud-1 folder).
 
@@ -138,17 +161,26 @@ To run the code with the three different configurations, we executed the followi
 ## Analysis
 
 ### Observations
-- Utilizing **8 cores on a single node** drastically reduced execution time compared to a **single core**, reflecting effective parallelization.
-- When splitting the task across **2 nodes**, the execution time increased compared to the single-node, 8-core setup. This is likely due to the overhead of communication between nodes.
+- Utilizing **8 cores on a single node** drastically reduced execution time compared to a **single core**, which shows that our code parallelized effectively.
+- When splitting the task across **2 nodes**, the execution time increased compared to the single-node, 8-core setup. Our hypothesis was that this was likely due to communication overhead. While the 2 node, 8 core code ran for a little over two times as long as the code with 1 node and 8 cores, it still ran almost three times faster than the code with only a single worker.
+To investigate this difference further we benchmarked our analysis on the smaller file, `mastodon-16m.ndjson`. For this we used the `benchmark_only` flag when executing the `slurm.sh` script from above with the same three resource configurations. The averaged runtimes can be seen below. Although we expected communication overhead to be even more pronounced on the small `mastodon-16m.ndjson` dataset because of the shorter compute time, the measured runtimes across the two 8-core configurations were actually very similar. We believe that this is likely because the total execution time is dominated by fixed costs, e.g. process initialization, file I/O, and MPI setup, which are less sensitive to the number of workers.
+
+| Configuration       | Average Execution Time on 16m Dataset(seconds) |
+|---------------------|------------------------------------------------|
+| 1 Node, 1 Core      | 0.0466                                         |
+| 1 Node, 8 Cores     | 0.0346                                         |
+| 2 Nodes, 8 Cores    | 0.0353                                         |
+
+![Average Execution Time on 16m Dataset](benchmark_time_comparison.png)
 
 ### Relating to Amdahl’s Law
 Amdahl's Law states that the speedup of a parallel program is limited by the portion of the program that cannot be parallelized. In our case:
-- The near-ideal speedup (286.38×8=2291.04≈2031.83) observed with **8 cores on 1 node** suggests the program is efficiently parallelized.
-- The degraded performance when using **2 nodes** suggests communication overhead as a limiting factor, consistent with Amdahl’s Law.
+- The near-ideal speedup (286.38s × 8[cores] = 2291.04s ≈ 2031.83s) observed with **8 cores on 1 node** suggests the program is efficiently parallelized.
+- The lower performance when using **2 nodes** suggests communication overhead as a limiting factor, consistent with Amdahl’s Law.
 
 ---
 
 ## Conclusion
-The analysis confirms the effectiveness of parallelization when using multiple cores on a single node. However, the performance degrades when using multiple nodes due to communication overhead.
+The analysis confirms the effectiveness of parallelization when using multiple cores on a single node. However, the performance degrades when using multiple nodes on the large dataset, likely due to communication overhead.
 
 
