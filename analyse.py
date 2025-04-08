@@ -16,7 +16,7 @@ ndjson_file = Path("../mastodon-16m.ndjson").resolve()
 
 def split_and_read_file():
 
-    with open(ndjson_file, 'r', encoding='utf-8') as f:
+    with open(ndjson_file, 'r') as f:
         if rank == 0:
             print("Successfully opened the file! Reading data...")
 

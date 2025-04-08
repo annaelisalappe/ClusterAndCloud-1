@@ -144,6 +144,7 @@ To run the code with the three different configurations, we executed the followi
 ---
 
 ## Results
+The total execution time for the three jobs is 3004.74 seconds (≈50 minutes) distributed as follows.
 
 | Configuration       | Execution Time (seconds) |
 |---------------------|--------------------------|
@@ -154,8 +155,12 @@ To run the code with the three different configurations, we executed the followi
 ---
 
 ### Performance Comparison Graph
+<div align="center">
 
 ![Execution Time Comparison](execution_time_comparison.png)
+
+</div>
+
 ---
 
 ## Analysis
@@ -163,7 +168,7 @@ To run the code with the three different configurations, we executed the followi
 ### Observations
 - Utilizing **8 cores on a single node** drastically reduced execution time compared to a **single core**, which shows that our code parallelized effectively.
 - When splitting the task across **2 nodes**, the execution time increased compared to the single-node, 8-core setup. Our hypothesis was that this was likely due to communication overhead. While the 2 node, 8 core code ran for a little over two times as long as the code with 1 node and 8 cores, it still ran almost three times faster than the code with only a single worker.
-To investigate this difference further we benchmarked our analysis on the smaller file, `mastodon-16m.ndjson`. For this we used the `benchmark_only` flag when executing the `slurm.sh` script from above with the same three resource configurations. The averaged runtimes can be seen below. Although we expected communication overhead to be even more pronounced on the small `mastodon-16m.ndjson` dataset because of the shorter compute time, the measured runtimes across the two 8-core configurations were actually very similar. We believe that this is likely because the total execution time is dominated by fixed costs, e.g. process initialization, file I/O, and MPI setup, which are less sensitive to the number of workers.
+To investigate this difference further we benchmarked our analysis on the smaller file, `mastodon-16m.ndjson`. For this we used the `benchmark_only` flag when executing the `slurm.sh` script from above with the same three resource configurations. The averaged runtimes can be seen below. Although we expected communication overhead to be even more pronounced on the small `mastodon-16m.ndjson` dataset because of the shorter compute time, the measured runtimes across the two 8-core configurations were actually very similar. We believe that this is likely because the total execution time is dominated by fixed costs, e.g. process initialization, file I/O, and MPI setup.
 
 | Configuration       | Average Execution Time on 16m Dataset(seconds) |
 |---------------------|------------------------------------------------|
