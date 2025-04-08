@@ -171,8 +171,6 @@ To investigate this difference further we benchmarked our analysis on the smalle
 | 1 Node, 8 Cores     | 0.0346                                         |
 | 2 Nodes, 8 Cores    | 0.0353                                         |
 
-![Average Execution Time on 16m Dataset](benchmark_time_comparison.png)
-
 ### Relating to Amdahl’s Law
 Amdahl's Law states that the speedup of a parallel program is limited by the portion of the program that cannot be parallelized. In our case:
 - The near-ideal speedup (286.38s × 8[cores] = 2291.04s ≈ 2031.83s) observed with **8 cores on 1 node** suggests the program is efficiently parallelized.
